@@ -8,37 +8,67 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
 ```
-
-#import datasets 
+# problem 1
+## import datasets 
 ```{r}
 waterwheel_data =
-  read_excel(path = "~/Desktop/Data Science/p8105_hw2_as5685/HealthyHarborWaterWheelTotals2018-7-28.xlsx","Mr. Trash Wheel", range = ("A2:N338")) %>%
+  read_excel(path = "~/Desktop/Data Science/p8105_hw2_as5685/Trash-wheel-collection-totals-8-6-19.xlsx","Mr. Trash Wheel", range = ("A2:N408")) %>%
   janitor::clean_names() %>%
-  drop_na(dumpster) 
+  drop_na(dumpster) %>% 
+  mutate(
+    sports_balls = round(sports_balls),
+    sports_balls = as.integer(sports_balls)
+  )
 ```
 
-?as.integer
-
-# clean precipitation data for 2017 and 2018
+## clean precipitation data for 2017 and 2018
 ```{r}
 precipitation2017_data =
-  readxl::read_excel(path = "~/Desktop/Data Science/p8105_hw2_as5685/HealthyHarborWaterWheelTotals2018-7-28.xlsx","2017 Precipitation", range = "A2:B14") %>%
-      janitor::clean_names() %>%
+  read_excel(path = "~/Desktop/Data Science/p8105_hw2_as5685/Trash-wheel-collection-totals-8-6-19.xlsx","2017 Precipitation", range = "A2:B14") %>%
+    janitor::clean_names() %>%
+    drop_na() %>% 
     mutate(year = "2017")
-
+    
 precipitation2018_data =
-  readxl::read_excel(path = "~/Desktop/Data Science/p8105_hw2_as5685/HealthyHarborWaterWheelTotals2018-7-28.xlsx","2018 Precipitation", range = "A2:B9") %>% 
-      janitor::clean_names() %>%
-  mutate(year = "2018") %>%
-  mutate(sum(total))
-
+  read_excel(path = "~/Desktop/Data Science/p8105_hw2_as5685/Trash-wheel-collection-totals-8-6-19.xlsx","2018 Precipitation", range = "A2:B14") %>% 
+    janitor::clean_names() %>%
+    drop_na() %>% 
+    mutate(year = "2018")
+   
 PrecipitationsCombined_data =
-bind_rows(precipitation2017_data, precipitation2018_data) 
+bind_rows(precipitation2017_data, precipitation2018_data) %>% 
+  mutate(
+    month = month.name[month]
+  )
 ```
 Interpretation about the data: 
 
+# problem2
+## read in Fivethirtyeight
+```{r}
+pols_month_data = read_csv("./fivethirtyeight_datasets/pols-month.csv") %>%
+  janitor::clean_names() %>%
+  separate(mon,into = c("year","month", "day"),sep = "-") %>% 
+  select(-prez_dem,-prez_gop,-day)
+
+snp_data = read_csv("./fivethirtyeight_datasets/snp.csv") %>% 
+  janitor::clean_names() %>% 
+  separate(date,into = c("month","day", "year"),sep = "/") %>% 
+  select(year, month, -day, close)
 
 
+unemployment_data = read_csv("./fivethirtyeight_datasets/unemployment.csv") %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    jan:dec,
+    names_to = "month",
+    values_to = "number"
+    )
+
+merged_data =
+  left_join(pols_month_data,snp_data,by = "month")
+
+```
 
 
 
