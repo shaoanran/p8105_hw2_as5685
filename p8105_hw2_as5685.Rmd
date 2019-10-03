@@ -69,10 +69,8 @@ merged_data =
   left_join(pols_month_data,snp_data,by = "month")
 
 ```
-
-
-
-
+# Problem 2
+## load and tidy baby_name data
 
 
 
