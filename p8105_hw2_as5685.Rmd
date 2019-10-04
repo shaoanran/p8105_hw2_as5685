@@ -138,6 +138,7 @@ pivot_wider(
   names_from = "year_of_birth",
   values_from = "rank"
 ) 
+knitr::kable(olivia_rank)
 
 ```
 
@@ -148,7 +149,8 @@ select(year_of_birth,ethnicity,childs_first_name) %>%
 pivot_wider(
   names_from = "year_of_birth",
   values_from = "childs_first_name"
-) 
+)
+knitr::kable(male_name_rank)
 ```
 
 ## plots for the number of children with a name against the rank
