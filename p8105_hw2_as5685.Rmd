@@ -24,7 +24,7 @@ waterwheel_data =
 ```
 
 
-##clean precipitation data for 2017 and 2018
+## Clean precipitation data for 2017 and 2018
 ```{r}
 precipitation2017_data =
   read_excel(path = "~/Desktop/Data Science/p8105_hw2_as5685/Trash-wheel-collection-totals-8-6-19.xlsx","2017 Precipitation", range = "A2:B14") %>%
@@ -47,53 +47,63 @@ bind_rows(precipitation2017_data, precipitation2018_data) %>%
 ```
 Interpretation about the data: 
 The total precipitation in 2018 is `r sum(pull(precipitation2018_data,total))`.
-The median number of sports balls in a dumpster in 217 is `r median(pull(filter(waterwheel_data,year == 2017),sports_balls))`. waterwheel_data =
-
+The median number of sports balls in a dumpster in 2017 is `r median(pull(filter(waterwheel_data,year == 2017),sports_balls))`. 
 The number of observation in waterwheel_data is `r nrow(waterwheel_data)`.
-The number of observation in merged data for 2017/2018 precipitation is `r nrow(PrecipitationsCombined_data)`.
+The number of observation in merged data for `precipitation2018_data` and `precipitation2017_data` is `r nrow(PrecipitationsCombined_data)`.
 In the dataset "PrecipitationsCombined_data", the colomn "total" is key variable which shows the total precipitation in each month of each year. Such as total precipitation is 2.34 inches in January 2017. This variables is related to the some variables in dataset "waterwheel_data", such as "dumpsters". If the total precipitation is large, then usually, the total number of dumpster filled will also be increased. So we can explore the relationship between them. 
 
-
 # problem2
-## read in Fivethirtyeight
+## Read in and Tidy Fivethirtyeight
 ```{r}
 pols_month_data = read_csv("./fivethirtyeight_datasets/pols-month.csv") %>%
   janitor::clean_names() %>%
   separate(mon,into = c("year","month", "day"),sep = "-") %>% 
   pivot_longer(
     cols = starts_with("prez"),
-    names_to = "prezsident", 
+    names_to = "president", 
     names_prefix = "prez_",
     values_to = "value"
   ) %>% 
 filter(value != "0") %>% 
-select(-day)
+select(-day) %>% 
+  mutate(
+    month = month.name[as.numeric(month)]
+  )
 
 snp_data = read_csv("./fivethirtyeight_datasets/snp.csv") %>% 
   janitor::clean_names() %>% 
   separate(date,into = c("month","day", "year"),sep = "/") %>% 
-  select(year, month, -day, close)
-
+  select(year, month, -day, close) %>% 
+  mutate(
+    month = month.name[as.numeric(month)]
+  )
 
 unemployment_data = read_csv("./fivethirtyeight_datasets/unemployment.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
     year = as.character(year) 
   ) %>% 
+  rename(Janurary = jan, Feburary = feb, March = mar, April = apr, June = jun, July = jul,  
+         August = aug, September = sep, October = oct, November = nov, December = dec) %>% 
   pivot_longer(
-    jan:dec,
+    Janurary:December,
     names_to = "month",
-    values_to = "rate"
+    values_to = "unemployment_percentage"
     )
 ```
 
-## merge 2017,2018 and unemployment  
+## Merge 2017,2018 and unemployment  
 ```{r}
 merged_data =
   left_join(pols_month_data,snp_data,by = c("year","month"))
 merged_three_data = 
   left_join(merged_data, unemployment_data, by = c("year","month"))
 ```
+Interpretation:
+In `snp_data`, it contains the values of GDP in the correspondent months during the range of year (`r range(snp_data$year)`). In `pols_month`, it contains the number of national politicians who are democratic or republican each month during the range of year (`r range(as.numeric(pols_month_data$year))`). In `unemployment_data`, it contains the `unemployment_percentage` each month during the range of year (`r range(as.numeric(unemployment_data$year))`). Before merging, variable `mon`for date is separated into `year` and `month`, so `merged_data` contains the `year` and `month`, and all other colomns of `snp_data` and `pols_month_data`. After merging `unemployment_data ` into the two combined datasets, the `merged_three_data` contains all of the variables of `snp_data`, `pols_month_data` and `unemployment_data`between 1947 and 2015, such as `close`,`president` taking values `prez_gop` and `prez_dem`, `unemployment_percentage` and some varaibles for the number of senators as well as representors. It is easier to look for the associaton between different variables. The dimensions of `snp_data`, `pols_month_data` and `unemployment_data` are (`r dim(snp_data)`),(`r dim(pols_month_data)`), (`r dim(unemployment_data)`). 
+
+
+
 
 # problem 3
 ## load and tidy NYC Open data 
@@ -136,7 +146,7 @@ pivot_wider(
 ) 
 ```
 
-## plots for the number of children against the rank
+## plots for the number of children with a name against the rank
 ```{r}
 plot_data = filter(baby_names_data, gender == "male", ethnicity == "white non hispanic", year_of_birth == "2016") %>% 
   ggplot(aes(x = rank, y = count)) + geom_point()
