@@ -47,9 +47,11 @@ bind_rows(precipitation2017_data, precipitation2018_data) %>%
 ```
 Interpretation about the data: 
 The total precipitation in 2018 is `r sum(pull(precipitation2018_data,total))`.
-The median number of sports balls in a dumpster in 2017 is `r median(pull(precipitation2017_data,total))`. 
+The median number of sports balls in a dumpster in 217 is `r median(pull(filter(waterwheel_data,year == 2017),sports_balls))`. waterwheel_data =
+
 The number of observation in waterwheel_data is `r nrow(waterwheel_data)`.
 The number of observation in merged data for 2017/2018 precipitation is `r nrow(PrecipitationsCombined_data)`.
+In the dataset "PrecipitationsCombined_data", the colomn "total" is key variable which shows the total precipitation in each month of each year. Such as total precipitation is 2.34 inches in January 2017. This variables is related to the some variables in dataset "waterwheel_data", such as "dumpsters". If the total precipitation is large, then usually, the total number of dumpster filled will also be increased. So we can explore the relationship between them. 
 
 
 # problem2
@@ -100,19 +102,46 @@ baby_names_data = read_csv("./Popular_Baby_Names.csv") %>%
   janitor::clean_names() %>% 
   mutate(
     gender = str_to_lower(gender),
+    childs_first_name = str_to_lower(childs_first_name),
     ethnicity = str_to_lower(ethnicity),
-    childs_first_name = str_to_lower(childs_first_name)
+    ethnicity = replace(ethnicity, ethnicity == "asian and paci", "asian and pacific islander"),
+    ethnicity = replace(ethnicity, ethnicity == "black non hisp", "black non hispanic"),
+    ethnicity = replace(ethnicity, ethnicity == "white non hisp", "white non hispanic")
   ) %>% 
-  distinct()
 
+distinct()
 ```
 
 
- 
- 
- 
+## rank "Olivia"
+```{r}
+olivia_rank = filter(baby_names_data, childs_first_name == "olivia", gender == "female") %>% 
+arrange(rank,year_of_birth) %>% 
+select(year_of_birth, rank,ethnicity) %>% 
 
+pivot_wider(
+  names_from = "year_of_birth",
+  values_from = "rank"
+) 
 
+```
+
+## rank boy's popular name
+```{r}
+male_name_rank = filter(baby_names_data, gender == "male", rank == "1") %>% 
+select(year_of_birth,ethnicity,childs_first_name) %>% 
+pivot_wider(
+  names_from = "year_of_birth",
+  values_from = "childs_first_name"
+) 
+```
+
+## plots for the number of children against the rank
+```{r}
+plot_data = filter(baby_names_data, gender == "male", ethnicity == "white non hispanic", year_of_birth == "2016") %>% 
+  ggplot(aes(x = rank, y = count)) + geom_point()
+
+```
 
 
 
