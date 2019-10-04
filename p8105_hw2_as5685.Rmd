@@ -103,12 +103,9 @@ Interpretation:
 In `snp_data`, it contains the values of GDP in the correspondent months during the range of year (`r range(snp_data$year)`). 
 In `pols_month`, it contains the number of national politicians who are democratic or republican each month during the range of year (`r range(as.numeric(pols_month_data$year))`). 
 In `unemployment_data`, it contains the `unemployment_percentage` each month during the range of year (`r range(as.numeric(unemployment_data$year))`). 
-Before merging, variable `mon`for date is separated into `year` and `month`, so `merged_data` contains the `year` and `month`, and all other colomns of `snp_data` and `pols_month_data`. 
-After merging `unemployment_data ` into the two combined datasets, the `merged_three_data` contains all of the variables of `snp_data`, `pols_month_data` and `unemployment_data`between 1947 and 2015, such as `close`,`president` taking values `prez_gop` and `prez_dem`, `unemployment_percentage` and some varaibles for the number of senators as well as representors. 
+Before merging, variable `mon`for date is separated into `year` and `month`, so `merged_data` contains the `year` and `month`, and all other colomns from either `snp_data` or `pols_month_data`. 
+After merging `unemployment_data ` into the two combined datasets, the `merged_three_data` contains all of the variables of `snp_data`, `pols_month_data` and `unemployment_data`between 1947 and 2015. The key variables include `close`,`president` taking values `prez_gop` and `prez_dem`, `unemployment_percentage` and some varaibles for the number of senators as well as representors. 
 It is easier to look for the associaton between different variables. The dimensions of `snp_data`, `pols_month_data` and `unemployment_data` are (`r dim(snp_data)`),(`r dim(pols_month_data)`), (`r dim(unemployment_data)`). 
-
-
-
 
 # problem 3
 ## load and tidy NYC Open data 
@@ -126,7 +123,6 @@ baby_names_data = read_csv("./Popular_Baby_Names.csv") %>%
 
 distinct()
 ```
-
 
 ## rank "Olivia"
 ```{r}
@@ -157,7 +153,6 @@ knitr::kable(male_name_rank)
 ```{r}
 plot_data = filter(baby_names_data, gender == "male", ethnicity == "white non hispanic", year_of_birth == 2016) 
   ggplot(plot_data, aes(x = rank, y = count)) + geom_point()
-
 ```
 
 
